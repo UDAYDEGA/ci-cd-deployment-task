@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="mavencloudhub20Flow"
+		doc:id="46d758ad-2bb2-4cb0-93a8-e708d58f2dfd">
+		<http:listener doc:name="Listener"
+			doc:id="ce4d0c67-da4a-40c6-9740-ff1e3b74293c" path="/maven"
+			config-ref="HTTP_Listener_config" />
+		
+		<set-payload value='#["Deployed"]' doc:name="Set Payload" doc:id="7764e7f6-9aea-458e-b300-67936646e053" />
+		<logger level="INFO" doc:name="Logger"
+			doc:id="4d06be70-5f27-4716-be98-6c7bd7cf15b1" message="#[payload]" />
+		<ee:transform doc:name="Transform Message"
+			doc:id="d842a494-bfe3-458f-ab19-217d0956f745">
+			<ee:message>
+				<ee:set-payload>
+<![CDATA[ %dw 2.0 output application/json --- payload ]]>
+				</ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
