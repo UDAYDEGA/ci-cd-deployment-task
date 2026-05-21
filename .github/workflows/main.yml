@@ -50,8 +50,6 @@ jobs:
       - name: Deploy to Dev
         run: |
           mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
-             -Danypoint.username="${ANYPOINT_USERNAME}" \
-             -Danypoint.password="${ANYPOINT_PASSWORD}" \
              -Danypoint.businessGroup="${BUSINESS_GROUP}" \
              -Danypoint.platform.client_id="${PLATFORM_CLIENT_ID}" \
              -Danypoint.platform.client_secret="${PLATFORM_CLIENT_SECRET}" \
