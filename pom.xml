@@ -53,7 +53,7 @@
       <properties>
        <anypoint.platform.client_id>6725d299b67b4198bc9a2fa7d40bf5c5</anypoint.platform.client_id>
        <anypoint.platform.client_secret>e23adfAAF04048A386800dA54161931C</anypoint.platform.client_secret>
-       <appname>ci-cd-deployment</appname>
+       <appname>ci-cd-deployment-inner</appname>
        <env>${env}</env>
       </properties>
      </cloudhub2Deployment>
