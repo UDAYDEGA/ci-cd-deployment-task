@@ -33,10 +33,10 @@ jobs:
             -Danypoint.username="${ANYPOINT_USERNAME}" \
             -Danypoint.password="${ANYPOINT_PASSWORD}"
 
-  deploydev:
+  deploytoSandbox:
     needs: build
     runs-on: ubuntu-latest
-    environment: Dev
+    environment: Sandbox
     steps:
       - name: Checkout this repo
         uses: actions/checkout@v4
@@ -47,10 +47,11 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - name: Deploy to Dev
+      - name: Deploy to Sandbox
         run: |
           mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
              -Danypoint.businessGroup="${BUSINESS_GROUP}" \
              -Danypoint.platform.client_id="${PLATFORM_CLIENT_ID}" \
              -Danypoint.platform.client_secret="${PLATFORM_CLIENT_SECRET}" \
-             -Denv="${MULE_ENV}" 
+             -Denv="${MULE_ENV}" \
+             -Dmule.runtime.version="${MULE_RUNTIME_VERSION}"
