@@ -36,8 +36,8 @@
       <releaseChannel>LTS</releaseChannel>
       <javaVersion>17</javaVersion>
       <server>anypoint-exchange-v3</server>
-      <connectedAppClientId>${anypoint.username}</connectedAppClientId>
-      <connectedAppClientSecret>${anypoint.password}</connectedAppClientSecret>
+      <connectedAppClientId>2b1c4d76f7b048bd8da9daec9b2338aa</connectedAppClientId>
+      <connectedAppClientSecret>D1C962f95d8c4EF5818350d130fC9189</connectedAppClientSecret>
       <connectedAppGrantType>client_credentials</connectedAppGrantType>
       <businessGroupId>${anypoint.businessGroup}</businessGroupId>
       <environment>${env}</environment>
