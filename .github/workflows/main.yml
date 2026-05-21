@@ -1,26 +1,49 @@
-name: MuleSoft Dynamic Deployment
+name: Dynamic MuleSoft CI/CD Deployment
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deployment Environment"
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - qa
+          - uat
+          - prod
+
+  push:
+    branches:
+      - main
 
 jobs:
 
-  deploy:
+  build:
 
     runs-on: ubuntu-latest
 
     steps:
 
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Java
+      - name: Cache Maven Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Create Maven Settings
+      - name: Create Maven Settings.xml
         run: |
           mkdir -p ~/.m2
 
@@ -40,8 +63,72 @@ jobs:
           </settings>
           EOF
 
-          echo "===== SETTINGS.XML ====="
+          echo "===== MAVEN SETTINGS ====="
           cat ~/.m2/settings.xml
+
+        env:
+          ANYPOINT_USERNAME: ${{ secrets.ANYPOINT_USERNAME }}
+          ANYPOINT_PASSWORD: ${{ secrets.ANYPOINT_PASSWORD }}
+
+      - name: Publish To Exchange
+        run: |
+          mvn clean deploy \
+          --settings ~/.m2/settings.xml \
+          -DskipMunitTests \
+          -Danypoint.username="${ANYPOINT_USERNAME}" \
+          -Danypoint.password="${ANYPOINT_PASSWORD}"
+
+        env:
+          ANYPOINT_USERNAME: ${{ secrets.ANYPOINT_USERNAME }}
+          ANYPOINT_PASSWORD: ${{ secrets.ANYPOINT_PASSWORD }}
+
+  deploy:
+
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: ${{ github.event.inputs.environment || 'dev' }}
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Cache Maven Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Create Maven Settings.xml
+        run: |
+          mkdir -p ~/.m2
+
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+
+            <servers>
+
+              <server>
+                <id>anypoint-exchange-v3</id>
+                <username>${ANYPOINT_USERNAME}</username>
+                <password>${ANYPOINT_PASSWORD}</password>
+              </server>
+
+            </servers>
+
+          </settings>
+          EOF
 
         env:
           ANYPOINT_USERNAME: ${{ secrets.ANYPOINT_USERNAME }}
@@ -53,13 +140,16 @@ jobs:
           --settings ~/.m2/settings.xml \
           -DmuleDeploy \
           -DskipMunitTests \
-          -Danypoint.username=$ANYPOINT_USERNAME \
-          -Danypoint.password=$ANYPOINT_PASSWORD \
-          -Danypoint.businessGroup=$BUSINESS_GROUP \
-          -Danypoint.platform.client_id=$PLATFORM_CLIENT_ID \
-          -Danypoint.platform.client_secret=$PLATFORM_CLIENT_SECRET \
-          -Denv=$MULE_ENV \
-          -Dmule.runtime.version=$MULE_RUNTIME_VERSION
+          -Danypoint.username="${ANYPOINT_USERNAME}" \
+          -Danypoint.password="${ANYPOINT_PASSWORD}" \
+          -Danypoint.businessGroup="${BUSINESS_GROUP}" \
+          -Danypoint.platform.client_id="${PLATFORM_CLIENT_ID}" \
+          -Danypoint.platform.client_secret="${PLATFORM_CLIENT_SECRET}" \
+          -Dmule.env="${MULE_ENV}" \
+          -Denv="${DEPLOY_ENV}" \
+          -Dappname="${APP_NAME}" \
+          -Dmule.runtime.version="${MULE_RUNTIME_VERSION}" \
+          -Dkey="${ENCRYPTION_KEY}"
 
         env:
           ANYPOINT_USERNAME: ${{ secrets.ANYPOINT_USERNAME }}
@@ -68,4 +158,7 @@ jobs:
           PLATFORM_CLIENT_ID: ${{ secrets.PLATFORM_CLIENT_ID }}
           PLATFORM_CLIENT_SECRET: ${{ secrets.PLATFORM_CLIENT_SECRET }}
           MULE_ENV: ${{ secrets.MULE_ENV }}
+          DEPLOY_ENV: ${{ secrets.DEPLOY_ENV }}
+          APP_NAME: ${{ secrets.APP_NAME }}
           MULE_RUNTIME_VERSION: ${{ secrets.MULE_RUNTIME_VERSION }}
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
