@@ -1,0 +1,62 @@
+name: MuleSoft Dynamic Deployment
+
+on:
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deployment Environment"
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - qa
+          - uat
+          - prod
+
+jobs:
+
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: ${{ github.event.inputs.environment }}
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Cache Maven Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+
+      - name: Deploy Mule Application
+        run: |
+          mvn clean deploy -DmuleDeploy \
+          -Danypoint.username=$ANYPOINT_USERNAME \
+          -Danypoint.password=$ANYPOINT_PASSWORD \
+          -Danypoint.businessGroup=$BUSINESS_GROUP \
+          -Danypoint.platform.client_id=$PLATFORM_CLIENT_ID \
+          -Danypoint.platform.client_secret=$PLATFORM_CLIENT_SECRET \
+          -Denv=$MULE_ENV \
+          -Dmule.runtime.version=$MULE_RUNTIME_VERSION
+
+        env:
+          ANYPOINT_USERNAME: ${{ secrets.ANYPOINT_USERNAME }}
+          ANYPOINT_PASSWORD: ${{ secrets.ANYPOINT_PASSWORD }}
+          BUSINESS_GROUP: ${{ secrets.BUSINESS_GROUP }}
+          PLATFORM_CLIENT_ID: ${{ secrets.PLATFORM_CLIENT_ID }}
+          PLATFORM_CLIENT_SECRET: ${{ secrets.PLATFORM_CLIENT_SECRET }}
+          MULE_ENV: ${{ secrets.MULE_ENV }}
+          MULE_RUNTIME_VERSION: ${{ secrets.MULE_RUNTIME_VERSION }}
