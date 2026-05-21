@@ -30,8 +30,8 @@ jobs:
       - name: Publish to Exchange
         run: |
           mvn deploy --settings .maven/settings.xml -DskipMunitTests \
-            -Danypoint.username="${ANYPOINT_USERNAME}" \
-            -Danypoint.password="${ANYPOINT_PASSWORD}"
+          -Danypoint.username="${{ secrets.ANYPOINT_USERNAME }}" \
+          -Danypoint.password="${{ secrets.ANYPOINT_PASSWORD }}"
 
   deploytoSandbox:
     needs: build
@@ -49,9 +49,10 @@ jobs:
             ${{ runner.os }}-maven-
       - name: Deploy to Sandbox
         run: |
-          mvn clean deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
-             -Danypoint.businessGroup="${BUSINESS_GROUP}" \
-             -Danypoint.platform.client_id="${PLATFORM_CLIENT_ID}" \
-             -Danypoint.platform.client_secret="${PLATFORM_CLIENT_SECRET}" \
-             -Denv="${MULE_ENV}" \
-             -Dmule.runtime.version="${MULE_RUNTIME_VERSION}"
+          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
+          -Danypoint.username="${{ secrets.ANYPOINT_USERNAME }}" \
+          -Danypoint.password="${{ secrets.PLATFORM_CLIENT_SECRET }}" \
+          -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
+          -Danypoint.platform.client_id="${{ secrets.PLATFORM_CLIENT_ID }}" \
+          -Danypoint.platform.client_secret="${{ secrets.PLATFORM_CLIENT_SECRET }}" \
+          -Dmule.env="${{ secrets.MULE_ENV }}" 
