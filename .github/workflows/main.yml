@@ -1,28 +1,13 @@
 name: MuleSoft Dynamic Deployment
 
 on:
-
   workflow_dispatch:
-    inputs:
-      environment:
-        description: "Deployment Environment"
-        required: true
-        default: dev
-        type: choice
-        options:
-          - dev
-          - qa
-          - uat
-          - prod
 
 jobs:
 
   deploy:
 
     runs-on: ubuntu-latest
-
-    environment:
-      name: ${{ github.event.inputs.environment }}
 
     steps:
 
@@ -35,16 +20,37 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Cache Maven Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+      - name: Create Maven Settings
+        run: |
+          mkdir -p ~/.m2
+
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+
+            <servers>
+
+              <server>
+                <id>anypoint-exchange-v3</id>
+                <username>${ANYPOINT_USERNAME}</username>
+                <password>${ANYPOINT_PASSWORD}</password>
+              </server>
+
+            </servers>
+
+          </settings>
+          EOF
+
+          echo "===== SETTINGS.XML ====="
+          cat ~/.m2/settings.xml
+
+        env:
+          ANYPOINT_USERNAME: ${{ secrets.ANYPOINT_USERNAME }}
+          ANYPOINT_PASSWORD: ${{ secrets.ANYPOINT_PASSWORD }}
 
       - name: Deploy Mule Application
         run: |
           mvn clean deploy \
-          --settings settings/settings.xml \
+          --settings ~/.m2/settings.xml \
           -DmuleDeploy \
           -DskipMunitTests \
           -Danypoint.username=$ANYPOINT_USERNAME \
@@ -54,7 +60,7 @@ jobs:
           -Danypoint.platform.client_secret=$PLATFORM_CLIENT_SECRET \
           -Denv=$MULE_ENV \
           -Dmule.runtime.version=$MULE_RUNTIME_VERSION
-      
+
         env:
           ANYPOINT_USERNAME: ${{ secrets.ANYPOINT_USERNAME }}
           ANYPOINT_PASSWORD: ${{ secrets.ANYPOINT_PASSWORD }}
