@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>
-${anypoint.businessGroup}</groupId>
+	<groupId>efeadf51-7191-4c48-805e-af0726859475</groupId>
 	<artifactId>ci-cd-deplyment-in</artifactId>
 	<version>1.0.8</version>
 	<packaging>mule-application</packaging>
@@ -37,11 +36,11 @@ ${anypoint.businessGroup}</groupId>
       <releaseChannel>LTS</releaseChannel>
       <javaVersion>17</javaVersion>
       <server>anypoint-exchange-v3</server>
-      <connectedAppClientId>${anypoint.username}</connectedAppClientId>
-      <connectedAppClientSecret>${anypoint.password}</connectedAppClientSecret>
+      <connectedAppClientId>2b1c4d76f7b048bd8da9daec9b2338aa</connectedAppClientId>
+      <connectedAppClientSecret>D1C962f95d8c4EF5818350d130fC9189</connectedAppClientSecret>
       <connectedAppGrantType>client_credentials</connectedAppGrantType>
-      <businessGroupId>${anypoint.businessGroup}</businessGroupId>
-      <environment>${env}</environment>
+      <businessGroupId>efeadf51-7191-4c48-805e-af0726859475</businessGroupId>
+      <environment>Dev</environment>
       <target>Cloudhub-US-East-2</target>
       <applicationName>ci-cd-deplyment</applicationName>
       <replicas>1</replicas>
@@ -52,8 +51,8 @@ ${anypoint.businessGroup}</groupId>
        <generateDefaultPublicUrl>true</generateDefaultPublicUrl>
       </deploymentSettings>
       <properties>
-       <anypoint.platform.client_id>${anypoint.platform.client_id}</anypoint.platform.client_id>
-       <anypoint.platform.client_secret>${anypoint.platform.client_secret}</anypoint.platform.client_secret>
+       <anypoint.platform.client_id>f4b12eae8e2f486798addea2e84b599b</anypoint.platform.client_id>
+       <anypoint.platform.client_secret>4108f97afc60488B8174c0Cd5A7BD239</anypoint.platform.client_secret>
        <appname>ci-cd-deployment</appname>
        <env>${env}</env>
       </properties>
@@ -70,7 +69,7 @@ ${anypoint.businessGroup}</groupId>
 		<repository>
 			<id>anypoint-exchange-v3</id>
 			<name>Anypoint Exchange</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v3/organizations/${anypoint.businessGroup}/maven</url>
+			<url>https://maven.anypoint.mulesoft.com/api/v3/organizations/efeadf51-7191-4c48-805e-af0726859475/maven</url>
 			<layout>default</layout>
 		</repository>
 	</distributionManagement>
