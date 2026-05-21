@@ -145,11 +145,8 @@ jobs:
           -Danypoint.businessGroup="${BUSINESS_GROUP}" \
           -Danypoint.platform.client_id="${PLATFORM_CLIENT_ID}" \
           -Danypoint.platform.client_secret="${PLATFORM_CLIENT_SECRET}" \
-          -Dmule.env="${MULE_ENV}" \
-          -Denv="${DEPLOY_ENV}" \
-          -Dappname="${APP_NAME}" \
-          -Dmule.runtime.version="${MULE_RUNTIME_VERSION}" \
-          -Dkey="${ENCRYPTION_KEY}"
+          -Dmule.env="${MULE_ENV}" 
+         
 
         env:
           ANYPOINT_USERNAME: ${{ secrets.ANYPOINT_USERNAME }}
@@ -158,7 +155,3 @@ jobs:
           PLATFORM_CLIENT_ID: ${{ secrets.PLATFORM_CLIENT_ID }}
           PLATFORM_CLIENT_SECRET: ${{ secrets.PLATFORM_CLIENT_SECRET }}
           MULE_ENV: ${{ secrets.MULE_ENV }}
-          DEPLOY_ENV: ${{ secrets.DEPLOY_ENV }}
-          APP_NAME: ${{ secrets.APP_NAME }}
-          MULE_RUNTIME_VERSION: ${{ secrets.MULE_RUNTIME_VERSION }}
-          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
