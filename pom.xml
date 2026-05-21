@@ -40,7 +40,7 @@
       <connectedAppClientSecret>D1C962f95d8c4EF5818350d130fC9189</connectedAppClientSecret>
       <connectedAppGrantType>client_credentials</connectedAppGrantType>
       <businessGroupId>efeadf51-7191-4c48-805e-af0726859475</businessGroupId>
-      <environment>Dev</environment>
+      <environment>Sandbox</environment>
       <target>Cloudhub-US-East-2</target>
       <applicationName>ci-cd-deplyment</applicationName>
       <replicas>1</replicas>
@@ -51,8 +51,8 @@
        <generateDefaultPublicUrl>true</generateDefaultPublicUrl>
       </deploymentSettings>
       <properties>
-       <anypoint.platform.client_id>f4b12eae8e2f486798addea2e84b599b</anypoint.platform.client_id>
-       <anypoint.platform.client_secret>4108f97afc60488B8174c0Cd5A7BD239</anypoint.platform.client_secret>
+       <anypoint.platform.client_id>6725d299b67b4198bc9a2fa7d40bf5c5</anypoint.platform.client_id>
+       <anypoint.platform.client_secret>e23adfAAF04048A386800dA54161931C</anypoint.platform.client_secret>
        <appname>ci-cd-deployment</appname>
        <env>${env}</env>
       </properties>
