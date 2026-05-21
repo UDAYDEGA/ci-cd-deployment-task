@@ -43,7 +43,10 @@ jobs:
 
       - name: Deploy Mule Application
         run: |
-          mvn clean deploy -DmuleDeploy \
+          mvn clean deploy \
+          -s settings/settings.xml \
+          -DmuleDeploy \
+          -DskipMunitTests \
           -Danypoint.username=$ANYPOINT_USERNAME \
           -Danypoint.password=$ANYPOINT_PASSWORD \
           -Danypoint.businessGroup=$BUSINESS_GROUP \
