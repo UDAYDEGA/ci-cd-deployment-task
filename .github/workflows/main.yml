@@ -49,7 +49,7 @@ jobs:
             ${{ runner.os }}-maven-
       - name: Deploy to Sandbox
         run: |
-          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
+          mvn clean deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
              -Danypoint.businessGroup="${BUSINESS_GROUP}" \
              -Danypoint.platform.client_id="${PLATFORM_CLIENT_ID}" \
              -Danypoint.platform.client_secret="${PLATFORM_CLIENT_SECRET}" \
