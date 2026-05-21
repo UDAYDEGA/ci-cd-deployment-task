@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>
 efeadf51-7191-4c48-805e-af0726859475</groupId>
-	<artifactId>ci-cd-deplyment</artifactId>
-	<version>1.0.6</version>
+	<artifactId>ci-cd-deplyment-in</artifactId>
+	<version>1.0.7</version>
 	<packaging>mule-application</packaging>
 
-	<name>ci-cd-deplyment</name>
+	<name>ci-cd-deplyment-in</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
