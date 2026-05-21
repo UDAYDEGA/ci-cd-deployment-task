@@ -55,4 +55,4 @@ jobs:
           -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
           -Dplatform.client_id="${{ secrets.PLATFORM_CLIENT_ID }}" \
           -Dplatform.client_secret="${{ secrets.PLATFORM_CLIENT_SECRET }}" \
-          -Dmule.env="${{ secrets.MULE_ENV }}" 
+          -Denv="${{ secrets.MULE_ENV }}" 
