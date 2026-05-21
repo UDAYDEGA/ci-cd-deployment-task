@@ -44,7 +44,7 @@ jobs:
       - name: Deploy Mule Application
         run: |
           mvn clean deploy \
-          -s settings/settings.xml \
+          --settings settings/settings.xml \
           -DmuleDeploy \
           -DskipMunitTests \
           -Danypoint.username=$ANYPOINT_USERNAME \
@@ -54,7 +54,7 @@ jobs:
           -Danypoint.platform.client_secret=$PLATFORM_CLIENT_SECRET \
           -Denv=$MULE_ENV \
           -Dmule.runtime.version=$MULE_RUNTIME_VERSION
-
+      
         env:
           ANYPOINT_USERNAME: ${{ secrets.ANYPOINT_USERNAME }}
           ANYPOINT_PASSWORD: ${{ secrets.ANYPOINT_PASSWORD }}
