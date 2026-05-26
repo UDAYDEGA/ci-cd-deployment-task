@@ -9,6 +9,7 @@ jobs:
 
   # ─────────────────────────────────────────────
   # JOB 1 - Build and publish to Exchange
+  # Uses username/password via settings.xml
   # ─────────────────────────────────────────────
   build:
     name: Build & Publish to Exchange
@@ -38,6 +39,7 @@ jobs:
 
   # ─────────────────────────────────────────────
   # JOB 2 - Deploy to Sandbox
+  # Uses connected app only (no username/password)
   # ─────────────────────────────────────────────
   deploy-sandbox:
     name: Deploy to Sandbox
@@ -59,8 +61,6 @@ jobs:
       - name: Deploy to Sandbox
         run: |
           mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
-            -Danypoint.username="${{ secrets.ANYPOINT_USERNAME }}" \
-            -Danypoint.password="${{ secrets.ANYPOINT_PASSWORD }}" \
             -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
             -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
             -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
@@ -91,8 +91,6 @@ jobs:
       - name: Deploy to Design
         run: |
           mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
-            -Danypoint.username="${{ secrets.ANYPOINT_USERNAME }}" \
-            -Danypoint.password="${{ secrets.ANYPOINT_PASSWORD }}" \
             -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
             -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
             -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
@@ -123,8 +121,6 @@ jobs:
       - name: Deploy to Dev
         run: |
           mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
-            -Danypoint.username="${{ secrets.ANYPOINT_USERNAME }}" \
-            -Danypoint.password="${{ secrets.ANYPOINT_PASSWORD }}" \
             -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
             -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
             -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
@@ -155,8 +151,6 @@ jobs:
       - name: Deploy to UAT
         run: |
           mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
-            -Danypoint.username="${{ secrets.ANYPOINT_USERNAME }}" \
-            -Danypoint.password="${{ secrets.ANYPOINT_PASSWORD }}" \
             -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
             -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
             -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
