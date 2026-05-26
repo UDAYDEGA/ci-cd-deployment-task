@@ -3,12 +3,12 @@ name: MuleSoft CI/CD - Deploy to All Environments
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:   # allows manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
 
   # ─────────────────────────────────────────────
-  # JOB 1 – Build, test, and publish to Exchange
+  # JOB 1 - Build and publish to Exchange
   # ─────────────────────────────────────────────
   build:
     name: Build & Publish to Exchange
@@ -37,14 +37,13 @@ jobs:
             -Danypoint.password="${{ secrets.ANYPOINT_PASSWORD }}"
 
   # ─────────────────────────────────────────────
-  # JOB 2 – Deploy to Sandbox
-  # GitHub Environment "Sandbox" controls approval
+  # JOB 2 - Deploy to Sandbox
   # ─────────────────────────────────────────────
   deploy-sandbox:
     name: Deploy to Sandbox
     needs: build
     runs-on: ubuntu-latest
-    environment: Sandbox          # add reviewers in GitHub → Settings → Environments
+    environment: Sandbox
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
@@ -62,17 +61,51 @@ jobs:
           mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
             -Danypoint.username="${{ secrets.ANYPOINT_USERNAME }}" \
             -Danypoint.password="${{ secrets.ANYPOINT_PASSWORD }}" \
+            -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
+            -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
             -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
             -Dplatform.client_id="${{ secrets.PLATFORM_CLIENT_ID }}" \
             -Dplatform.client_secret="${{ secrets.PLATFORM_CLIENT_SECRET }}" \
-            -Denv="${{ secrets.MULE_ENV }}"
+            -Denv="Sandbox"
 
   # ─────────────────────────────────────────────
-  # JOB 3 – Deploy to Dev
+  # JOB 3 - Deploy to Design
+  # ─────────────────────────────────────────────
+  deploy-design:
+    name: Deploy to Design
+    needs: deploy-sandbox
+    runs-on: ubuntu-latest
+    environment: Design
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 17
+
+      - name: Deploy to Design
+        run: |
+          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
+            -Danypoint.username="${{ secrets.ANYPOINT_USERNAME }}" \
+            -Danypoint.password="${{ secrets.ANYPOINT_PASSWORD }}" \
+            -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
+            -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
+            -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
+            -Dplatform.client_id="${{ secrets.PLATFORM_CLIENT_ID }}" \
+            -Dplatform.client_secret="${{ secrets.PLATFORM_CLIENT_SECRET }}" \
+            -Denv="Design"
+
+  # ─────────────────────────────────────────────
+  # JOB 4 - Deploy to Dev
   # ─────────────────────────────────────────────
   deploy-dev:
     name: Deploy to Dev
-    needs: deploy-sandbox
+    needs: deploy-design
     runs-on: ubuntu-latest
     environment: Dev
     steps:
@@ -92,19 +125,21 @@ jobs:
           mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
             -Danypoint.username="${{ secrets.ANYPOINT_USERNAME }}" \
             -Danypoint.password="${{ secrets.ANYPOINT_PASSWORD }}" \
+            -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
+            -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
             -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
             -Dplatform.client_id="${{ secrets.PLATFORM_CLIENT_ID }}" \
             -Dplatform.client_secret="${{ secrets.PLATFORM_CLIENT_SECRET }}" \
-            -Denv="${{ secrets.MULE_ENV }}"
+            -Denv="Dev"
 
   # ─────────────────────────────────────────────
-  # JOB 4 – Deploy to QA
+  # JOB 5 - Deploy to UAT
   # ─────────────────────────────────────────────
-  deploy-qa:
-    name: Deploy to QA
+  deploy-uat:
+    name: Deploy to UAT
     needs: deploy-dev
     runs-on: ubuntu-latest
-    environment: QA
+    environment: UAT
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
@@ -117,43 +152,14 @@ jobs:
           distribution: zulu
           java-version: 17
 
-      - name: Deploy to QA
+      - name: Deploy to UAT
         run: |
           mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
             -Danypoint.username="${{ secrets.ANYPOINT_USERNAME }}" \
             -Danypoint.password="${{ secrets.ANYPOINT_PASSWORD }}" \
+            -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
+            -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
             -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
             -Dplatform.client_id="${{ secrets.PLATFORM_CLIENT_ID }}" \
             -Dplatform.client_secret="${{ secrets.PLATFORM_CLIENT_SECRET }}" \
-            -Denv="${{ secrets.MULE_ENV }}"
-
-  # ─────────────────────────────────────────────
-  # JOB 5 – Deploy to Production
-  # Requires manual approval in GitHub UI
-  # ─────────────────────────────────────────────
-  deploy-production:
-    name: Deploy to Production
-    needs: deploy-qa
-    runs-on: ubuntu-latest
-    environment: Production       # always put a required reviewer here
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: zulu
-          java-version: 17
-
-      - name: Deploy to Production
-        run: |
-          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
-            -Danypoint.username="${{ secrets.ANYPOINT_USERNAME }}" \
-            -Danypoint.password="${{ secrets.ANYPOINT_PASSWORD }}" \
-            -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
-            -Dplatform.client_id="${{ secrets.PLATFORM_CLIENT_ID }}" \
-            -Dplatform.client_secret="${{ secrets.PLATFORM_CLIENT_SECRET }}" \
-            -Denv="${{ secrets.MULE_ENV }}"
+            -Denv="UAT"
