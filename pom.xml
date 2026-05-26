@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>efeadf51-7191-4c48-805e-af0726859475</groupId>
 	<artifactId>ci-cd-deployment-inners</artifactId>
-	<version>1.2.1</version>
+	<version>1.2.2</version>
 	<packaging>mule-application</packaging>
 
 	<name>ci-cd-deployment-inners</name>
@@ -35,9 +35,8 @@
       <muleVersion>4.9.16</muleVersion>
       <releaseChannel>LTS</releaseChannel>
       <javaVersion>17</javaVersion>
-      <server>anypoint-exchange-v3</server>
-      <connectedAppClientId>2b1c4d76f7b048bd8da9daec9b2338aa</connectedAppClientId>
-      <connectedAppClientSecret>D1C962f95d8c4EF5818350d130fC9189</connectedAppClientSecret>
+      <connectedAppClientId>${connected.app.client_id}</connectedAppClientId>
+	  <connectedAppClientSecret>${connected.app.client_secret}</connectedAppClientSecret>
       <connectedAppGrantType>client_credentials</connectedAppGrantType>
       <businessGroupId>${anypoint.businessGroup}</businessGroupId>
       <environment>${env}</environment>
