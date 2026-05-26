@@ -5,15 +5,15 @@ echo ============================================
 echo   MuleSoft Deploy - All Environments
 echo ============================================
 
-REM ─── CONNECTED APP (same for all envs) ───────
+REM ─── CONNECTED APP credentials ───────────────
 set ANYPOINT_USERNAME=~~~Client~~~
 set ANYPOINT_PASSWORD=2b1c4d76f7b048bd8da9daec9b2338aa~?~D1C962f95d8c4EF5818350d130fC9189
-set CONNECTED_APP_CLIENT_ID=2b1c4d76f7b048bd8da9daec9b2338aa
-set CONNECTED_APP_CLIENT_SECRET=D1C962f95d8c4EF5818350d130fC9189
+set CONNECTED_APP_ID=2b1c4d76f7b048bd8da9daec9b2338aa
+set CONNECTED_APP_SECRET=D1C962f95d8c4EF5818350d130fC9189
 set BUSINESS_GROUP=efeadf51-7191-4c48-805e-af0726859475
 
 REM ─── PLATFORM CLIENT ID/SECRET PER ENV ───────
-REM IMPORTANT: Names must EXACTLY match Anypoint Portal
+REM Must EXACTLY match environment names in Anypoint Portal
 REM Check: anypoint.mulesoft.com > Access Management > Environments
 
 set PLATFORM_CLIENT_ID_Sandbox=6725d299b67b4198bc9a2fa7d40bf5c5
@@ -25,7 +25,6 @@ set PLATFORM_CLIENT_SECRET_Design=D2Ed9A9D6633471fA507C4bcaABf45B3
 set PLATFORM_CLIENT_ID_Dev=f4b12eae8e2f486798addea2e84b599b
 set PLATFORM_CLIENT_SECRET_Dev=4108f97afc60488b8174c0Cd5A7BD239
 
-REM Change UAT to exactly match your Anypoint env name (UAT / Uat / uat)
 set PLATFORM_CLIENT_ID_UAT=e94aa625d8ce451bac0bbede47ef51ec
 set PLATFORM_CLIENT_SECRET_UAT=00adfA4e1C1447FaA3632bfc3459fb4A
 REM ─────────────────────────────────────────────
@@ -74,13 +73,13 @@ echo.
 echo [DEPLOY] %ENV_NAME%...
 echo -----------------------------------------
 call mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy ^
-  -Danypoint.username="%ANYPOINT_USERNAME%"                   ^
-  -Danypoint.password="%ANYPOINT_PASSWORD%"                   ^
-  -Dconnected.app.client_id="%CONNECTED_APP_CLIENT_ID%"       ^
-  -Dconnected.app.client_secret="%CONNECTED_APP_CLIENT_SECRET%" ^
-  -Danypoint.businessGroup="%BUSINESS_GROUP%"                 ^
-  -Dplatform.client_id="%CLIENT_ID%"                          ^
-  -Dplatform.client_secret="%CLIENT_SECRET%"                  ^
+  -Danypoint.username="%ANYPOINT_USERNAME%"              ^
+  -Danypoint.password="%ANYPOINT_PASSWORD%"              ^
+  -Dconnected.app.client_id="%CONNECTED_APP_ID%"         ^
+  -Dconnected.app.client_secret="%CONNECTED_APP_SECRET%" ^
+  -Danypoint.businessGroup="%BUSINESS_GROUP%"            ^
+  -Dplatform.client_id="%CLIENT_ID%"                     ^
+  -Dplatform.client_secret="%CLIENT_SECRET%"             ^
   -Denv="%ENV_NAME%"
 
 if %ERRORLEVEL% NEQ 0 (
