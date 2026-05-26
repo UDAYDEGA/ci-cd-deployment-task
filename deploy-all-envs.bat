@@ -1,104 +1,83 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 
-REM ==========================================
-REM COMMON VALUES
-REM ==========================================
+echo ============================================
+echo   MuleSoft Deploy - All Environments
+echo ============================================
 
-set ANYPOINT_USERNAME=~Client~
-set ANYPOINT_PASSWORD=YOUR_CONNECTED_APP_SECRET
-set BUSINESS_GROUP=YOUR_BUSINESS_GROUP
+REM ─── CONNECTED APP (same for all envs) ───────
+set ANYPOINT_USERNAME=~~~Client~~~
+set ANYPOINT_PASSWORD=2b1c4d76f7b048bd8da9daec9b2338aa~?~D1C962f95d8c4EF5818350d130fC9189
+set BUSINESS_GROUP=efeadf51-7191-4c48-805e-af0726859475
 
-REM ==========================================
-REM DEPLOY TO SANDBOX
-REM ==========================================
+REM ─── PLATFORM CLIENT ID/SECRET PER ENV ───────
+set PLATFORM_CLIENT_ID_Sandbox=6725d299b67b4198bc9a2fa7d40bf5c5
+set PLATFORM_CLIENT_SECRET_Sandbox=e23adfAAF04048A386800dA54161931C
 
-echo Deploying to SANDBOX...
+set PLATFORM_CLIENT_ID_Design=1d3a3581e5954ec2aa5396ecd1e4eaeb
+set PLATFORM_CLIENT_SECRET_Design=D2Ed9A9D6633471fA507C4bcaABf45B3
 
-call mvn clean deploy ^
---settings .maven/settings.xml ^
--DskipMunitTests ^
--DmuleDeploy ^
--Danypoint.username=%ANYPOINT_USERNAME% ^
--Danypoint.password=%ANYPOINT_PASSWORD% ^
--Danypoint.businessGroup=%BUSINESS_GROUP% ^
--Dplatform.client_id=SANDBOX_CLIENT_ID ^
--Dplatform.client_secret=SANDBOX_CLIENT_SECRET ^
--Denv=Sandbox
+set PLATFORM_CLIENT_ID_Dev=f4b12eae8e2f486798addea2e84b599b
+set PLATFORM_CLIENT_SECRET_Dev=4108f97afc60488b8174c0Cd5A7BD239
 
-IF %ERRORLEVEL% NEQ 0 (
-    echo Sandbox Deployment Failed
+set PLATFORM_CLIENT_ID_Uat=e94aa625d8ce451bac0bbede47ef51ec
+set PLATFORM_CLIENT_SECRET_Uat=00adfA4e1C1447FaA3632bfc3459fb4A
+REM ─────────────────────────────────────────────
+
+REM ── Step 1: Publish to Anypoint Exchange ─────
+echo.
+echo [1/5] Publishing to Anypoint Exchange...
+echo -----------------------------------------
+call mvn deploy --settings .maven/settings.xml -DskipMunitTests ^
+  -Danypoint.username="%ANYPOINT_USERNAME%" ^
+  -Danypoint.password="%ANYPOINT_PASSWORD%"
+
+if %ERRORLEVEL% NEQ 0 (
+    echo ERROR: Exchange publish failed. Stopping.
     exit /b 1
 )
+echo SUCCESS: Published to Exchange.
 
-REM ==========================================
-REM DEPLOY TO DEV
-REM ==========================================
+REM ── Step 2-5: Deploy to all envs in order ────
+call :DEPLOY_ENV Sandbox
+if %ERRORLEVEL% NEQ 0 exit /b 1
 
-echo Deploying to DEV...
+call :DEPLOY_ENV Design
+if %ERRORLEVEL% NEQ 0 exit /b 1
 
-call mvn deploy ^
---settings .maven/settings.xml ^
--DskipMunitTests ^
--DmuleDeploy ^
--Danypoint.username=%ANYPOINT_USERNAME% ^
--Danypoint.password=%ANYPOINT_PASSWORD% ^
--Danypoint.businessGroup=%BUSINESS_GROUP% ^
--Dplatform.client_id=DEV_CLIENT_ID ^
--Dplatform.client_secret=DEV_CLIENT_SECRET ^
--Denv=Dev
+call :DEPLOY_ENV Dev
+if %ERRORLEVEL% NEQ 0 exit /b 1
 
-IF %ERRORLEVEL% NEQ 0 (
-    echo Dev Deployment Failed
+call :DEPLOY_ENV Uat
+if %ERRORLEVEL% NEQ 0 exit /b 1
+
+echo.
+echo ============================================
+echo   ALL ENVIRONMENTS DEPLOYED SUCCESSFULLY
+echo ============================================
+exit /b 0
+
+
+REM ─── FUNCTION: deploy to one environment ─────
+:DEPLOY_ENV
+set ENV_NAME=%1
+set CLIENT_ID=!PLATFORM_CLIENT_ID_%ENV_NAME%!
+set CLIENT_SECRET=!PLATFORM_CLIENT_SECRET_%ENV_NAME%!
+
+echo.
+echo [DEPLOY] %ENV_NAME%...
+echo -----------------------------------------
+call mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy ^
+  -Danypoint.username="%ANYPOINT_USERNAME%"   ^
+  -Danypoint.password="%ANYPOINT_PASSWORD%"   ^
+  -Danypoint.businessGroup="%BUSINESS_GROUP%" ^
+  -Dplatform.client_id="%CLIENT_ID%"          ^
+  -Dplatform.client_secret="%CLIENT_SECRET%"  ^
+  -Denv="%ENV_NAME%"
+
+if %ERRORLEVEL% NEQ 0 (
+    echo ERROR: Deployment to %ENV_NAME% FAILED.
     exit /b 1
 )
-
-REM ==========================================
-REM DEPLOY TO QA
-REM ==========================================
-
-echo Deploying to QA...
-
-call mvn deploy ^
---settings .maven/settings.xml ^
--DskipMunitTests ^
--DmuleDeploy ^
--Danypoint.username=%ANYPOINT_USERNAME% ^
--Danypoint.password=%ANYPOINT_PASSWORD% ^
--Danypoint.businessGroup=%BUSINESS_GROUP% ^
--Dplatform.client_id=QA_CLIENT_ID ^
--Dplatform.client_secret=QA_CLIENT_SECRET ^
--Denv=QA
-
-IF %ERRORLEVEL% NEQ 0 (
-    echo QA Deployment Failed
-    exit /b 1
-)
-
-REM ==========================================
-REM DEPLOY TO PRODUCTION
-REM ==========================================
-
-echo Deploying to PRODUCTION...
-
-call mvn deploy ^
---settings .maven/settings.xml ^
--DskipMunitTests ^
--DmuleDeploy ^
--Danypoint.username=%ANYPOINT_USERNAME% ^
--Danypoint.password=%ANYPOINT_PASSWORD% ^
--Danypoint.businessGroup=%BUSINESS_GROUP% ^
--Dplatform.client_id=PROD_CLIENT_ID ^
--Dplatform.client_secret=PROD_CLIENT_SECRET ^
--Denv=Production
-
-IF %ERRORLEVEL% NEQ 0 (
-    echo Production Deployment Failed
-    exit /b 1
-)
-
-echo ==========================================
-echo ALL ENVIRONMENTS DEPLOYED SUCCESSFULLY
-echo ==========================================
-
-pause
+echo SUCCESS: Deployed to %ENV_NAME%.
+exit /b 0
