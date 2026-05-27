@@ -18,11 +18,39 @@
 
 	<build>
 		<plugins>
+			<!-- ✅ FIX: Resolves ${revision} to actual value before publishing -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<configuration>
+					<updatePomFile>true</updatePomFile>
+					<flattenMode>resolveCiFriendliesOnly</flattenMode>
+				</configuration>
+				<executions>
+					<execution>
+						<id>flatten</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>flatten</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>flatten.clean</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>3.2.0</version>
 			</plugin>
+
 			<plugin>
 				<groupId>org.mule.tools.maven</groupId>
 				<artifactId>mule-maven-plugin</artifactId>
@@ -35,27 +63,21 @@
 						<muleVersion>4.9.16</muleVersion>
 						<releaseChannel>LTS</releaseChannel>
 						<javaVersion>17</javaVersion>
-
-						<!-- No <server> tag - using connected app credentials via -D flags -->
 						<connectedAppClientId>${connected.app.client_id}</connectedAppClientId>
 						<connectedAppClientSecret>${connected.app.client_secret}</connectedAppClientSecret>
 						<connectedAppGrantType>client_credentials</connectedAppGrantType>
-
 						<businessGroupId>${anypoint.businessGroup}</businessGroupId>
 						<environment>${env}</environment>
 						<target>Cloudhub-US-East-2</target>
 						<applicationName>ci-cd-deployment-inners</applicationName>
 						<replicas>1</replicas>
 						<vCores>0.1</vCores>
-
 						<deploymentSettings>
 							<lastMileSecurity>false</lastMileSecurity>
 							<forwardSslSession>false</forwardSslSession>
 							<generateDefaultPublicUrl>true</generateDefaultPublicUrl>
-							<!-- FIX: UPDATE existing app instead of creating new one -->
 							<updateStrategy>recreate</updateStrategy>
 						</deploymentSettings>
-
 						<properties>
 							<anypoint.platform.client_id>${platform.client_id}</anypoint.platform.client_id>
 							<anypoint.platform.client_secret>${platform.client_secret}</anypoint.platform.client_secret>
