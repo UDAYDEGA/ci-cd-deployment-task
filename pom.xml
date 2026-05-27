@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>efeadf51-7191-4c48-805e-af0726859475</groupId>
 	<artifactId>ci-cd-deployment-inners</artifactId>
-	<version>1.2.5</version>
+	<version>1.2.6</version>
 	<packaging>mule-application</packaging>
 
 	<name>ci-cd-deployment-inners</name>
