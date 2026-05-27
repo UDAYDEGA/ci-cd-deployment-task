@@ -35,8 +35,8 @@
       <muleVersion>4.9.16</muleVersion>
       <releaseChannel>LTS</releaseChannel>
       <javaVersion>17</javaVersion>
-      <connectedAppClientId>${connected.app.client_id}</connectedAppClientId>
-	  <connectedAppClientSecret>${connected.app.client_secret}</connectedAppClientSecret>
+      <connectedAppClientId>4d2ab59fe904412a8e9de0c0e6f062a5</connectedAppClientId>
+	  <connectedAppClientSecret>8cD852DE9c21462784D3e2007D1d1AA5</connectedAppClientSecret>
       <connectedAppGrantType>client_credentials</connectedAppGrantType>
       <businessGroupId>${anypoint.businessGroup}</businessGroupId>
       <environment>${env}</environment>
@@ -50,8 +50,8 @@
        <generateDefaultPublicUrl>true</generateDefaultPublicUrl>
       </deploymentSettings>
       <properties>
-       <anypoint.platform.client_id>4d2ab59fe904412a8e9de0c0e6f062a5</anypoint.platform.client_id>
-       <anypoint.platform.client_secret>8cD852DE9c21462784D3e2007D1d1AA5</anypoint.platform.client_secret>
+       <anypoint.platform.client_id>${platform.client_id}</anypoint.platform.client_id>
+       <anypoint.platform.client_secret>${platform.client_secret}</anypoint.platform.client_secret>
        <appname>ci-cd-deployment-inners</appname>
        <env>${env}</env>
       </properties>
