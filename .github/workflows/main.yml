@@ -7,11 +7,6 @@ on:
 
 jobs:
 
-  # ─────────────────────────────────────────────
-  # JOB 1 - Build and publish to Exchange
-  # Version auto-increments using GitHub run number
-  # e.g. 1.0.1, 1.0.2, 1.0.3 ... on every push
-  # ─────────────────────────────────────────────
   build:
     name: Build & Publish to Exchange
     runs-on: ubuntu-latest
@@ -33,18 +28,12 @@ jobs:
           java-version: 17
 
       - name: Publish to Anypoint Exchange
-        # revision = GitHub run number (auto-increments: 1, 2, 3...)
-        # so version becomes 1.0.1, 1.0.2, 1.0.3 etc. on every push
         run: |
-          mvn deploy --settings .maven/settings.xml -DskipMunitTests \
+          mvn deploy --settings .maven/settings.xml -DskipMunitTests -e \
             -Drevision="${{ github.run_number }}" \
             -Danypoint.username="${{ secrets.ANYPOINT_USERNAME }}" \
             -Danypoint.password="${{ secrets.ANYPOINT_PASSWORD }}"
 
-  # ─────────────────────────────────────────────
-  # JOB 2 - Deploy to Sandbox
-  # Same jar version, just different -Denv
-  # ─────────────────────────────────────────────
   deploy-sandbox:
     name: Deploy to Sandbox
     needs: build
@@ -64,7 +53,7 @@ jobs:
 
       - name: Deploy to Sandbox
         run: |
-          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
+          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy -e \
             -Drevision="${{ github.run_number }}" \
             -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
             -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
@@ -73,9 +62,6 @@ jobs:
             -Dplatform.client_secret="${{ secrets.PLATFORM_CLIENT_SECRET }}" \
             -Denv="Sandbox"
 
-  # ─────────────────────────────────────────────
-  # JOB 3 - Deploy to Dev
-  # ─────────────────────────────────────────────
   deploy-dev:
     name: Deploy to Dev
     needs: deploy-sandbox
@@ -95,7 +81,7 @@ jobs:
 
       - name: Deploy to Dev
         run: |
-          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
+          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy -e \
             -Drevision="${{ github.run_number }}" \
             -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
             -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
@@ -104,9 +90,6 @@ jobs:
             -Dplatform.client_secret="${{ secrets.PLATFORM_CLIENT_SECRET }}" \
             -Denv="Dev"
 
-  # ─────────────────────────────────────────────
-  # JOB 4 - Deploy to UAT
-  # ─────────────────────────────────────────────
   deploy-uat:
     name: Deploy to UAT
     needs: deploy-dev
@@ -126,7 +109,7 @@ jobs:
 
       - name: Deploy to UAT
         run: |
-          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
+          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy -e \
             -Drevision="${{ github.run_number }}" \
             -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
             -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
@@ -135,10 +118,6 @@ jobs:
             -Dplatform.client_secret="${{ secrets.PLATFORM_CLIENT_SECRET }}" \
             -Denv="UAT"
 
-  # ─────────────────────────────────────────────
-  # JOB 5 - Deploy to Production
-  # Requires manual approval in GitHub UI
-  # ─────────────────────────────────────────────
   deploy-production:
     name: Deploy to Production
     needs: deploy-uat
@@ -158,7 +137,7 @@ jobs:
 
       - name: Deploy to Production
         run: |
-          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
+          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy -e \
             -Drevision="${{ github.run_number }}" \
             -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
             -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
