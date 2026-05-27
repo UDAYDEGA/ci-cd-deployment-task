@@ -7,6 +7,11 @@ on:
 
 jobs:
 
+  # ─────────────────────────────────────────────
+  # JOB 1 - Build and publish to Exchange
+  # Version is set using maven versions plugin
+  # before publishing so Exchange gets exact version
+  # ─────────────────────────────────────────────
   build:
     name: Build & Publish to Exchange
     runs-on: ubuntu-latest
@@ -27,13 +32,19 @@ jobs:
           distribution: zulu
           java-version: 17
 
+      - name: Set version to 1.0.${{ github.run_number }}
+        run: |
+          mvn versions:set -DnewVersion="1.0.${{ github.run_number }}" -DgenerateBackupPoms=false
+
       - name: Publish to Anypoint Exchange
         run: |
-          mvn deploy --settings .maven/settings.xml -DskipMunitTests -e \
-            -Drevision="${{ github.run_number }}" \
+          mvn deploy --settings .maven/settings.xml -DskipMunitTests \
             -Danypoint.username="${{ secrets.ANYPOINT_USERNAME }}" \
             -Danypoint.password="${{ secrets.ANYPOINT_PASSWORD }}"
 
+  # ─────────────────────────────────────────────
+  # JOB 2 - Deploy to Sandbox
+  # ─────────────────────────────────────────────
   deploy-sandbox:
     name: Deploy to Sandbox
     needs: build
@@ -51,10 +62,12 @@ jobs:
           distribution: zulu
           java-version: 17
 
+      - name: Set version to 1.0.${{ github.run_number }}
+        run: mvn versions:set -DnewVersion="1.0.${{ github.run_number }}" -DgenerateBackupPoms=false
+
       - name: Deploy to Sandbox
         run: |
-          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy -e \
-            -Drevision="${{ github.run_number }}" \
+          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
             -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
             -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
             -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
@@ -62,6 +75,9 @@ jobs:
             -Dplatform.client_secret="${{ secrets.PLATFORM_CLIENT_SECRET }}" \
             -Denv="Sandbox"
 
+  # ─────────────────────────────────────────────
+  # JOB 3 - Deploy to Dev
+  # ─────────────────────────────────────────────
   deploy-dev:
     name: Deploy to Dev
     needs: deploy-sandbox
@@ -79,10 +95,12 @@ jobs:
           distribution: zulu
           java-version: 17
 
+      - name: Set version to 1.0.${{ github.run_number }}
+        run: mvn versions:set -DnewVersion="1.0.${{ github.run_number }}" -DgenerateBackupPoms=false
+
       - name: Deploy to Dev
         run: |
-          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy -e \
-            -Drevision="${{ github.run_number }}" \
+          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
             -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
             -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
             -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
@@ -90,6 +108,9 @@ jobs:
             -Dplatform.client_secret="${{ secrets.PLATFORM_CLIENT_SECRET }}" \
             -Denv="Dev"
 
+  # ─────────────────────────────────────────────
+  # JOB 4 - Deploy to UAT
+  # ─────────────────────────────────────────────
   deploy-uat:
     name: Deploy to UAT
     needs: deploy-dev
@@ -107,10 +128,12 @@ jobs:
           distribution: zulu
           java-version: 17
 
+      - name: Set version to 1.0.${{ github.run_number }}
+        run: mvn versions:set -DnewVersion="1.0.${{ github.run_number }}" -DgenerateBackupPoms=false
+
       - name: Deploy to UAT
         run: |
-          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy -e \
-            -Drevision="${{ github.run_number }}" \
+          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
             -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
             -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
             -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
@@ -118,6 +141,10 @@ jobs:
             -Dplatform.client_secret="${{ secrets.PLATFORM_CLIENT_SECRET }}" \
             -Denv="UAT"
 
+  # ─────────────────────────────────────────────
+  # JOB 5 - Deploy to Production
+  # Requires manual approval in GitHub UI
+  # ─────────────────────────────────────────────
   deploy-production:
     name: Deploy to Production
     needs: deploy-uat
@@ -135,10 +162,12 @@ jobs:
           distribution: zulu
           java-version: 17
 
+      - name: Set version to 1.0.${{ github.run_number }}
+        run: mvn versions:set -DnewVersion="1.0.${{ github.run_number }}" -DgenerateBackupPoms=false
+
       - name: Deploy to Production
         run: |
-          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy -e \
-            -Drevision="${{ github.run_number }}" \
+          mvn deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
             -Dconnected.app.client_id="${{ secrets.CONNECTED_APP_ID }}" \
             -Dconnected.app.client_secret="${{ secrets.CONNECTED_APP_SECRET }}" \
             -Danypoint.businessGroup="${{ secrets.BUSINESS_GROUP }}" \
