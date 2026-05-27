@@ -73,7 +73,7 @@ jobs:
   # ─────────────────────────────────────────────
   deploy-dev:
     name: Deploy to Dev
-    needs: deploy-design
+    needs: deploy-sandbox
     runs-on: ubuntu-latest
     environment: Dev
     steps:
