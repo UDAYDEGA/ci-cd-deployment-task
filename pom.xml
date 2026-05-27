@@ -9,9 +9,9 @@
 	<name>ci-cd-deployment-inners</name>
 
 	<properties>
+		<revision>0</revision>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
 		<app.runtime>4.9.16</app.runtime>
 		<mule.maven.plugin.version>4.7.0</mule.maven.plugin.version>
 	</properties>
@@ -24,44 +24,50 @@
 				<version>3.2.0</version>
 			</plugin>
 			<plugin>
-    <groupId>org.mule.tools.maven</groupId>
-    <artifactId>mule-maven-plugin</artifactId>
-    <version>${mule.maven.plugin.version}</version>
-    <extensions>true</extensions>
-    <configuration>
-     <cloudhub2Deployment>
-      <uri>https://anypoint.mulesoft.com</uri>
-      <provider>MC</provider>
-      <muleVersion>4.9.16</muleVersion>
-      <releaseChannel>LTS</releaseChannel>
-      <javaVersion>17</javaVersion>
-      <connectedAppClientId>${connected.app.client_id}</connectedAppClientId>
-	  <connectedAppClientSecret>${connected.app.client_secret}</connectedAppClientSecret>
-      <connectedAppGrantType>client_credentials</connectedAppGrantType>
-      <businessGroupId>${anypoint.businessGroup}</businessGroupId>
-      <environment>${env}</environment>
-      <target>Cloudhub-US-East-2</target>
-      <applicationName>ci-cd-deployment-inners</applicationName>
-      <replicas>1</replicas>
-      <vCores>0.1</vCores>
-      <deploymentSettings>
-       <lastMileSecurity>false</lastMileSecurity>
-       <forwardSslSession>false</forwardSslSession>
-       <generateDefaultPublicUrl>true</generateDefaultPublicUrl>
-      </deploymentSettings>
-      <properties>
-       <anypoint.platform.client_id>${platform.client_id}</anypoint.platform.client_id>
-       <anypoint.platform.client_secret>${platform.client_secret}</anypoint.platform.client_secret>
-       <appname>ci-cd-deployment-inners</appname>
-       <env>${env}</env>
-      </properties>
-     </cloudhub2Deployment>
-     <classifier>mule-application</classifier>
-    </configuration>
-   </plugin>
+				<groupId>org.mule.tools.maven</groupId>
+				<artifactId>mule-maven-plugin</artifactId>
+				<version>${mule.maven.plugin.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<cloudhub2Deployment>
+						<uri>https://anypoint.mulesoft.com</uri>
+						<provider>MC</provider>
+						<muleVersion>4.9.16</muleVersion>
+						<releaseChannel>LTS</releaseChannel>
+						<javaVersion>17</javaVersion>
+
+						<!-- No <server> tag - using connected app credentials via -D flags -->
+						<connectedAppClientId>${connected.app.client_id}</connectedAppClientId>
+						<connectedAppClientSecret>${connected.app.client_secret}</connectedAppClientSecret>
+						<connectedAppGrantType>client_credentials</connectedAppGrantType>
+
+						<businessGroupId>${anypoint.businessGroup}</businessGroupId>
+						<environment>${env}</environment>
+						<target>Cloudhub-US-East-2</target>
+						<applicationName>ci-cd-deployment-inners</applicationName>
+						<replicas>1</replicas>
+						<vCores>0.1</vCores>
+
+						<deploymentSettings>
+							<lastMileSecurity>false</lastMileSecurity>
+							<forwardSslSession>false</forwardSslSession>
+							<generateDefaultPublicUrl>true</generateDefaultPublicUrl>
+							<!-- FIX: UPDATE existing app instead of creating new one -->
+							<updateStrategy>recreate</updateStrategy>
+						</deploymentSettings>
+
+						<properties>
+							<anypoint.platform.client_id>${platform.client_id}</anypoint.platform.client_id>
+							<anypoint.platform.client_secret>${platform.client_secret}</anypoint.platform.client_secret>
+							<appname>ci-cd-deployment-inners</appname>
+							<env>${env}</env>
+						</properties>
+					</cloudhub2Deployment>
+					<classifier>mule-application</classifier>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
-
 
 	<distributionManagement>
 		<repository>
@@ -115,4 +121,3 @@
 	</pluginRepositories>
 
 </project>
-
